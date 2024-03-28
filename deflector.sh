@@ -1,7 +1,7 @@
 #!/bin/bash
 args=("$@")
 
-echo "Deflector Control Script"
+echo "Deflector Shield Control Script"
 echo "First let's logon to Azure emergency account ()"  
 az login
 
@@ -21,7 +21,7 @@ sendwhatsapp() {
 
 case $1 in
     "1")
-        echo "Deflector Level 1"
+        echo "Deflector Shield Level 1"
         # Create a new Azure emergency admin account (az account admin ...) no CAP or MFA required use generic password and name
         az account admin create --name "EmergencyAdmin" --password "P@ssw0rd" --email "emergencyaad@xxxy.bbbbbby.be" --role "Owner"
         # autmatically cycle passwords of all current admin accounts and store generated password in Azure Key Vault
@@ -45,7 +45,7 @@ case $1 in
         ###########################################################################################################################
         ;;
     "2")
-        echo "Deflector Level 2"
+        echo "Deflector Shield Level 2"
         # Lock down all public IP addresses => disable all
         az network public-ip list --query "[?ipAddress!=null].{Name:name,IP:ipAddress}" --output table | awk '{print $1}' | xargs -I {} az network public-ip update --name {} --resource-group $rg --allocation-method Static --idle-timeout 0
         # Lock down NSG => block external access to all VMs or services
@@ -69,7 +69,7 @@ case $1 in
         ###########################################################################################################################
         ;;
     "3")
-        echo "Deflector Level 3"
+        echo "Deflector Shield Level 3"
         # Lock down all Azure VMs
         az vm list --query "[?powerState=='VM running'].{Name:name,ResourceGroup:resourceGroup}" --output table | awk '{print $1}' | xargs -I {} az vm stop --name {} --resource-group {}
         # Create new Dynamics 365 emergency admin account
@@ -91,7 +91,7 @@ case $1 in
         ###########################################################################################################################
         ;;
     "4")
-        echo "Deflector Level 4"
+        echo "Deflector Shield Level 4"
         # Lock down all on-premises servers and services
         ssh onpremises1 -c "shutdown -h now"
         ssh onpremises2 -c "shutdown -h now"
@@ -111,7 +111,7 @@ case $1 in
         ###########################################################################################################################
         ;;
     "5")
-        echo "Deflector Level 5"
+        echo "Deflector Shield Level 5"
         # Lock down all Azure resources
         az resource list --query "[?type=='Microsoft.Compute/virtualMachines'].{Name:name,ResourceGroup:resourceGroup}" --output table | awk '{print $1}' | xargs -I {} az vm stop --name {} --resource-group {}
         az resource list --query "[?type=='Microsoft.Network/publicIPAddresses'].{Name:name,ResourceGroup:resourceGroup}" --output table | awk '{print $1}' | xargs -I {} az network public-ip update --name {} --resource-group $rg --allocation-method Static --idle-timeout 0
