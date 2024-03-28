@@ -116,6 +116,13 @@ case $1 in
         az resource list --query "[?type=='Microsoft.Compute/virtualMachines'].{Name:name,ResourceGroup:resourceGroup}" --output table | awk '{print $1}' | xargs -I {} az vm stop --name {} --resource-group {}
         az resource list --query "[?type=='Microsoft.Network/publicIPAddresses'].{Name:name,ResourceGroup:resourceGroup}" --output table | awk '{print $1}' | xargs -I {} az network public-ip update --name {} --resource-group $rg --allocation-method Static --idle-timeout 0
         az resource list --query "[?type=='Microsoft.Network/networkSecurityGroups'].{Name:name,ResourceGroup:resourceGroup}" --output table | awk '{print $1}' | xargs -I {} az network nsg rule create --name "DenyAllInbound" --nsg-name {} --resource-group {} --priority 100 --source-address-prefixes "*" --source-port-ranges "*" --destination-address-prefixes "*" --destination-port-ranges "*" --access Deny --protocol "*" --direction Inbound        
+        ###########################################################################################################################
+        #                                                  IMPACT ANALYSIS                                                        #
+        # 1. All Azure resources will be stopped                                                                                  #
+        # 2. All public IP addresses will be disabled                                                                             #
+        # 3. All NSG rules will be updated to block all inbound traffic                                                           #
+        # 4. Production Services shall be impacted !!!!!                                                                          #
+        ###########################################################################################################################
         ;;
     *)
         echo "Usage: $0 {1|2|3|4|5}"
