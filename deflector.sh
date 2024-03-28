@@ -92,9 +92,30 @@ case $1 in
         ;;
     "4")
         echo "Deflector Level 4"
+        # Lock down all on-premises servers and services
+        ssh onpremises1 -c "shutdown -h now"
+        ssh onpremises2 -c "shutdown -h now"
+        ssh onpremises3 -c "shutdown -h now"
+        # Lock down all on-premises firewalls
+        fortigatecli -c "config system global; set admin-ssh disable; set admin-web disable; end"
+        paloaltocli -c "configure; set deviceconfig system service disable-telnet yes; set deviceconfig system service disable-http yes; set deviceconfig system service disable-https yes; commit"
+        # Lock down all on-premises VPNs
+        ssh paloalto1 -c "configure; set network vpn ipsec ike gateway AzureVPN dead-peer-detection action clear; commit"
+        ssh paloalto2 -c "configure; set network vpn ipsec ike gateway AzureVPN dead-peer-detection action clear; commit"
+        ###########################################################################################################################
+        #                                                  IMPACT ANALYSIS                                                        #
+        # 1. All on-premises servers and services will be stopped                                                                 #
+        # 2. All on-premises firewalls will be disabled                                                                           #
+        # 3. All on-premises VPNs will be disabled                                                                                #
+        # 4. Production Services shall be impacted !!!!!                                                                          #
+        ###########################################################################################################################
         ;;
     "5")
         echo "Deflector Level 5"
+        # Lock down all Azure resources
+        az resource list --query "[?type=='Microsoft.Compute/virtualMachines'].{Name:name,ResourceGroup:resourceGroup}" --output table | awk '{print $1}' | xargs -I {} az vm stop --name {} --resource-group {}
+        az resource list --query "[?type=='Microsoft.Network/publicIPAddresses'].{Name:name,ResourceGroup:resourceGroup}" --output table | awk '{print $1}' | xargs -I {} az network public-ip update --name {} --resource-group $rg --allocation-method Static --idle-timeout 0
+        az resource list --query "[?type=='Microsoft.Network/networkSecurityGroups'].{Name:name,ResourceGroup:resourceGroup}" --output table | awk '{print $1}' | xargs -I {} az network nsg rule create --name "DenyAllInbound" --nsg-name {} --resource-group {} --priority 100 --source-address-prefixes "*" --source-port-ranges "*" --destination-address-prefixes "*" --destination-port-ranges "*" --access Deny --protocol "*" --direction Inbound        
         ;;
     *)
         echo "Usage: $0 {1|2|3|4|5}"
