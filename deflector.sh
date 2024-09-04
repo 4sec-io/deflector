@@ -5,6 +5,29 @@ echo "Deflector Shield Control Script"
 echo "First let's logon to Azure emergency account ()"  
 az login
 
+###########################################################################################################################
+#                                                  INVESTIGATIONS                                                         #
+# 1. Check Azure Activity Log for any suspicious activities                                                               #
+# 2. Check Azure Security Center for any security recommendations                                                         #
+# 3. Check Azure Monitor for any alerts or incidents                                                                      #
+# 4. Check Azure Sentinel for any security incidents                                                                      #
+# 5. Check Azure Security Center for any security recommendations                                                         #
+# 6. Check SOC alerts                                                                                                     #
+# 7. Check SIEM alerts                                                                                                    #
+###########################################################################################################################
+
+###########################################################################################################################
+#                                               ** To be evaluated **                                                     #
+# 1. test : https://github.com/normen/whatscli for whatsapp cli                                                           #
+# 2. test : something for whatsapp cli                                                                                    #
+# 3. test : something for fortinet cli                                                                                    #
+# 4. test : something for paloalto cli                                                                                    #
+# 5. test : something for f5 cli                                                                                          #
+# 6. test : something for openvpn cli                                                                                     #
+###########################################################################################################################
+
+
+
 Create-WhatsappGroup() {
     # Create a new whatsapp group with the given name and members
     # $1 = group name
